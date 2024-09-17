@@ -1,4 +1,6 @@
 
+using CodeMazeTutorial.Extensions;
+using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
@@ -7,8 +9,8 @@ using Serilog.Configuration;
 namespace CodeMazeTutorial
 {
 
-	// Last page: 40 (CompanyConfiguration class)
-	public class Program
+    // Last page: 40 (CompanyConfiguration class)
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -22,17 +24,23 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureIISIntegration();
 			builder.Services.ConfigureLoggerService();
 			builder.Services.ConfigureRepositoryManager();
+			builder.Services.ConfigureServiceManager();
+			builder.Services.ConfigureSqlContext(builder.Configuration);
+			builder.Services.AddAutoMapper(typeof(Program));
 
-			builder.Services.AddControllers();
+			builder.Services.AddControllers()
+				.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 
 			var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
+			var logger = app.Services.GetRequiredService<ILoggerManager>();
+			app.ConfigureExceptionHandler(logger);
 
-			if (app.Environment.IsDevelopment())
-				app.UseDeveloperExceptionPage();
-			else
+			// Configure the HTTP request pipeline.
+			if(app.Environment.IsProduction())
+			{
 				app.UseHsts();
+			}
 
             app.UseHttpsRedirection();
 			app.UseStaticFiles();
