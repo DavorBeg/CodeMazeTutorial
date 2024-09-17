@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using LoggerService;
+using Repository;
 
 namespace CodeMazeTutorial
 {
@@ -26,6 +27,8 @@ namespace CodeMazeTutorial
 			services.AddSingleton<ILoggerManager, LoggerManager>();
 
 
+		public static void ConfigureRepositoryManager(this IServiceCollection services) =>
+			services.AddScoped<IRepositoryManager, RepositoryManager>();
     }
 
 }

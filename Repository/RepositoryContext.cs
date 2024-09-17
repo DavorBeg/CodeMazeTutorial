@@ -1,5 +1,6 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
+using Repository.Configuration;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Repository
@@ -13,5 +14,11 @@ namespace Repository
         {
             
         }
-    }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+			modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+		}
+	}
 }

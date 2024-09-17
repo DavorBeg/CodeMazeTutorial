@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeMazeTutorial", ".\CodeMazeTutorial\CodeMazeTutorial.csproj", "{6C29ADF2-C6B1-43EE-97DD-E7F4BBAEA64E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeMazeTutorial", "CodeMazeTutorial\CodeMazeTutorial.csproj", "{6C29ADF2-C6B1-43EE-97DD-E7F4BBAEA64E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", ".\Contracts\Contracts.csproj", "{C439FFB3-D6E7-45CB-80BD-E956492F27AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{C439FFB3-D6E7-45CB-80BD-E956492F27AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", ".\LoggerService\LoggerService.csproj", "{AB0357DA-CB2F-450B-BE1D-3D7CA316D62E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerService\LoggerService.csproj", "{AB0357DA-CB2F-450B-BE1D-3D7CA316D62E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", ".\Entities\Entities.csproj", "{77A12BA6-48D9-40BB-A94A-22B2E9DED648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{77A12BA6-48D9-40BB-A94A-22B2E9DED648}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", ".\Repository\Repository.csproj", "{96717406-71F8-4EBA-86F4-70A8CFCE0D78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{96717406-71F8-4EBA-86F4-70A8CFCE0D78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Contracts", "Service.Contracts\Service.Contracts.csproj", "{0E733305-7B12-458B-A656-E0EBC4C09A99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{38F5B379-E4F4-4549-BF6E-1A58CA437306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{96717406-71F8-4EBA-86F4-70A8CFCE0D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96717406-71F8-4EBA-86F4-70A8CFCE0D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96717406-71F8-4EBA-86F4-70A8CFCE0D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E733305-7B12-458B-A656-E0EBC4C09A99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E733305-7B12-458B-A656-E0EBC4C09A99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E733305-7B12-458B-A656-E0EBC4C09A99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E733305-7B12-458B-A656-E0EBC4C09A99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38F5B379-E4F4-4549-BF6E-1A58CA437306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38F5B379-E4F4-4549-BF6E-1A58CA437306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38F5B379-E4F4-4549-BF6E-1A58CA437306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38F5B379-E4F4-4549-BF6E-1A58CA437306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
