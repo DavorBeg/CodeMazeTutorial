@@ -1,0 +1,6 @@
+@CodeMazeTutorial_HostAddress = http://localhost:5020
+
+GET {{CodeMazeTutorial_HostAddress}}/
+Accept: application/json
+
+###
