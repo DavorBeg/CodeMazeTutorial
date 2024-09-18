@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Contracts;
+using Entities;
 using Entities.Exceptions;
 using Service.Contracts;
-using Shared.DataTransferObjects;
+using Shared.DataTransferObjects.EmployeeDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-	internal sealed class EmployeeService : IEmployeeService
+    internal sealed class EmployeeService : IEmployeeService
 	{
 		private readonly IRepositoryManager _repository;
 		private readonly ILoggerManager _logger;
@@ -21,6 +22,20 @@ namespace Service
 			_repository = repository;
 			_logger = logger;
 			_mapper = mapper;	
+		}
+
+		public EmployeeDto CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
+		{
+			var company = _repository.Company.GetCompany(companyId, trackChanges);
+			if (company == null)
+				throw new CompanyNotFoundException(companyId);
+
+			var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
+			_repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
+			_repository.Save();
+
+			var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
+			return employeeToReturn;
 		}
 
 		public EmployeeDto GetEmployee(Guid companyId, Guid id, bool trackChanges)

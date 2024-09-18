@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Entities;
-using Shared.DataTransferObjects;
+using Shared.DataTransferObjects.CompanyDtos;
+using Shared.DataTransferObjects.EmployeeDtos;
 
 namespace CodeMazeTutorial
 {
-	public class MappingProfile : Profile
+    public class MappingProfile : Profile
 	{
         public MappingProfile()
         {
@@ -15,6 +16,8 @@ namespace CodeMazeTutorial
                 });
 
             CreateMap<Employee, EmployeeDto>();
+            CreateMap<CompanyForCreationDto, Company>();
+            CreateMap<EmployeeForCreationDto, Employee>();
         }
     }
 }

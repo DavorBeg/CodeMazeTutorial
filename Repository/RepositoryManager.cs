@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Contracts.Repositories;
 using Repository.Repositories;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-	public class RepositoryManager : IRepositoryManager
+    public class RepositoryManager : IRepositoryManager
 	{
 		private readonly RepositoryContext _context;
 		private readonly Lazy<ICompanyRepository> _companyRepository;
