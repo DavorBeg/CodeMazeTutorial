@@ -4,6 +4,8 @@ using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Configuration;
 
@@ -29,6 +31,17 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureSqlContext(builder.Configuration);
 			builder.Services.AddAutoMapper(typeof(Program));
 
+#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+			NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
+			new ServiceCollection()
+			.AddLogging()
+			.AddMvc()
+			.AddNewtonsoftJson()
+			.Services.BuildServiceProvider()
+			.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
+			.OfType<NewtonsoftJsonPatchInputFormatter>().First();
+#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+
 			builder.Services.Configure<ApiBehaviorOptions>(options =>
 			{
 				options.SuppressModelStateInvalidFilter = true;
@@ -38,6 +51,7 @@ namespace CodeMazeTutorial
 			{
 				config.RespectBrowserAcceptHeader = true;
 				config.ReturnHttpNotAcceptable = true;
+				config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
 			})
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
