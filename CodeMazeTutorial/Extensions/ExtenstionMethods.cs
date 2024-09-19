@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using CompanyEmployees.Presentation.ActionFilters;
+using Contracts;
 using LoggerService;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -41,6 +42,11 @@ namespace CodeMazeTutorial.Extensions
 
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void AddActionFiltersServices(this IServiceCollection services)
+        {
+            services.AddScoped<ValidationFilterAttribute>();
+        }
     }
 
 }
