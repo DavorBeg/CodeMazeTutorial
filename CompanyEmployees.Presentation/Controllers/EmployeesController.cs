@@ -1,8 +1,11 @@
 ﻿
+using CompanyEmployees.Presentation.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DataTransferObjects.CompanyDtos;
 using Shared.DataTransferObjects.EmployeeDtos;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,29 +24,42 @@ namespace CompanyEmployees.Presentation.Controllers
             _serviceManager = serviceManager;
         }
 
+
+
+
 		[HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
-		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+		public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
         {
-            var employees = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, false);
+            var employees = await _serviceManager.EmployeeService.GetEmployeeAsync(companyId, id, false);
             return Ok(employees);
         }
+		[HttpGet]
+		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
+		{
+			var employees = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+			return Ok(employees);
+		}
 
-        [HttpPost]
-        public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee) 
+
+
+
+		[HttpPost]
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
+		public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee) 
         {
-
-            if (employee is null)
-                return BadRequest("Employee object is null");
-
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
             var employeeToReturn = await _serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, false);
             return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
 
         }
 
-        [HttpDelete]
+		[HttpPost("collection")]
+		public async Task<IActionResult> CreateEmployeesForCompany(Guid companyId, [FromBody] IEnumerable<EmployeeForCreationDto> employees)
+		{
+			var result = await _serviceManager.EmployeeService.CreateEmployeeCollectionForCompanyAsync(companyId, employees);
+			return CreatedAtRoute("GetEmployeeForCompany", new { result.ids }, result.employees);
+		}
+
+		[HttpDelete]
         public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid employeeId) 
         {
 
@@ -53,13 +69,9 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDto employee)
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
+		public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDto employee)
         {
-            if (employee is null)
-                return BadRequest("Employee for update object is null.");
-            if(!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
             await _serviceManager.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, id, employee, false, true);
             return NoContent();
         }
