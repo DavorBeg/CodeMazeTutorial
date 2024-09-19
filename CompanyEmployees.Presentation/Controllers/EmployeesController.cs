@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects.EmployeeDtos;
 using System;
@@ -57,5 +59,21 @@ namespace CompanyEmployees.Presentation.Controllers
             return NoContent();
         }
 
-    }
+        // its important to add to request header this:
+		// Content-type: application/json-patch+json
+		[HttpPatch("{id:guid}")]
+        public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
+        {
+            if (patchDoc is null)
+                return BadRequest("Patching docs sent from client is null");
+
+            var result = _serviceManager.EmployeeService.GetEmployeeForPatch(companyId, id, false, true);
+
+            patchDoc.ApplyTo(result.employeeToPatch);
+
+            _serviceManager.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
+            return NoContent();
+        }
+
+	}
 }

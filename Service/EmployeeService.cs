@@ -72,6 +72,7 @@ namespace Service
 		public (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(Guid companyId, Guid id, bool CompTrackChanges, bool empTrackChanges)
 		{
 			var company = _repository.Company.GetCompany(companyId, CompTrackChanges);
+
 			if (company is null)
 				throw new CompanyNotFoundException(companyId);
 
@@ -81,13 +82,13 @@ namespace Service
 				throw new EmployeeNotFoundException(id);
 
 			var employeeToPatch = _mapper.Map<EmployeeForUpdateDto>(employeeEntity);
-			
 			return (employeeToPatch, employeeEntity);
 
 		}
 		public void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
 		{
-			throw new NotImplementedException();
+			_mapper.Map(employeeToPatch, employeeEntity);
+			_repository.Save();
 		}
 
 		public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges)
