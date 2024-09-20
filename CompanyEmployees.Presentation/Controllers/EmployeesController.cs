@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CompanyEmployees.Presentation.Controllers
@@ -25,32 +26,35 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
 
-
-
 		[HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
 		public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var employees = await _serviceManager.EmployeeService.GetEmployeeAsync(companyId, id, false);
             return Ok(employees);
         }
-		[HttpGet]
+
+
+		[HttpGet(Name = "EmployeeCollection")]
 		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
 		{
-			var employees = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
-			return Ok(employees);
+
+            var pagedResult = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, false);
+            Response.Headers["X-Pagination"] = JsonSerializer.Serialize(pagedResult.metaData);
+
+			return Ok(pagedResult.employees);
 		}
-
-
 
 
 		[HttpPost]
 		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee) 
         {
-            var employeeToReturn = await _serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, false);
-            return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
 
-        }
+            var employeeToReturn = await _serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, false);
+	        return CreatedAtRoute(routeName: "GetEmployeeForCompany", routeValues: new { companyId, id = employeeToReturn.Id }, value: employeeToReturn);
+
+		}
+
 
 		[HttpPost("collection")]
 		public async Task<IActionResult> CreateEmployeesForCompany(Guid companyId, [FromBody] IEnumerable<EmployeeForCreationDto> employees)

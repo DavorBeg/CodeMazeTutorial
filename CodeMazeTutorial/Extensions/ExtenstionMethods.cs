@@ -18,6 +18,7 @@ namespace CodeMazeTutorial.Extensions
                     b.AllowAnyOrigin();
                     b.AllowAnyMethod();
                     b.AllowAnyHeader();
+                    b.WithExposedHeaders("X-Pagination");
                 });
             });
 

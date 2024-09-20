@@ -6,6 +6,7 @@ using Service.Contracts;
 using Shared.DataTransferObjects.CompanyDtos;
 using Shared.DataTransferObjects.EmployeeDtos;
 using Shared.RequestFeatures;
+using Shared.RequestFeatures.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,21 +101,17 @@ namespace Service
 			await _repository.SaveAsync();
 		}
 
-		public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
+		public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
 		{
+			if (!employeeParameters.ValidAgeRange)
+				throw new MaxAgeRangeBadRequestException();
 
-			var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges);
-			if (company == null)
-				throw new CompanyNotFoundException(companyId);
+			await CheckIfCompanyExist(companyId, trackChanges);
 			
-			var employees = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
+			var employeesWithMetaData = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
+			var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
-			if (employees == null || !employees.Any())
-				throw new EmployeesNotFoundException(companyId);
-
-			var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
-			return employeesDto;
-
+			return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
 		}
 
 		public async Task UpdateEmployeeForCompanyAsync(Guid companyId, Guid id, EmployeeForUpdateDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges)
