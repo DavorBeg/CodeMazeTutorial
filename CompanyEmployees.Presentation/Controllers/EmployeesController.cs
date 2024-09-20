@@ -35,6 +35,7 @@ namespace CompanyEmployees.Presentation.Controllers
 
 
 		[HttpGet(Name = "EmployeeCollection")]
+		[ServiceFilter(typeof(ValidateMediaTypeAttribute))]
 		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
 		{
 

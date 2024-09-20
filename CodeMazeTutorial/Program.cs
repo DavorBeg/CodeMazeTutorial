@@ -1,5 +1,6 @@
 
 using CodeMazeTutorial.Extensions;
+using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -32,6 +33,7 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureServiceManager();
 			builder.Services.ConfigureSqlContext(builder.Configuration);
 			builder.Services.AddActionFiltersServices();
+			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
 
@@ -50,6 +52,8 @@ namespace CodeMazeTutorial
 			})
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
+
+			builder.Services.AddCustomMediaTypes();
 
 			builder.Services.AddControllers()
 				.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
