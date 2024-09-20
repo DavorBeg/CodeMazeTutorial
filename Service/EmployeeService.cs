@@ -9,6 +9,7 @@ using Shared.RequestFeatures;
 using Shared.RequestFeatures.Abstract;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +21,14 @@ namespace Service
 		private readonly IRepositoryManager _repository;
 		private readonly ILoggerManager _logger;
 		private readonly IMapper _mapper;
-        public EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+		private readonly IDataShaper<EmployeeDto> _dataShaper;
+        public EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IDataShaper<EmployeeDto> dataShaper)
 		{
 			_repository = repository;
 			_logger = logger;
 			_mapper = mapper;	
+			_dataShaper = dataShaper;
+
 		}
 
 		private async Task CheckIfCompanyExist(Guid companyId, bool trackChanges)
@@ -101,7 +105,7 @@ namespace Service
 			await _repository.SaveAsync();
 		}
 
-		public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
+		public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
 		{
 			if (!employeeParameters.ValidAgeRange)
 				throw new MaxAgeRangeBadRequestException();
@@ -110,8 +114,9 @@ namespace Service
 			
 			var employeesWithMetaData = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
 			var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
+			var shapedData = _dataShaper.ShapeData(employeesDto, employeeParameters.Fields ?? string.Empty);
 
-			return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
+			return (employees: shapedData, metaData: employeesWithMetaData.MetaData);
 		}
 
 		public async Task UpdateEmployeeForCompanyAsync(Guid companyId, Guid id, EmployeeForUpdateDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges)

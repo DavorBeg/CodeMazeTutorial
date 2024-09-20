@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Configuration;
+using Service.DataShaping;
+using Shared.DataTransferObjects.EmployeeDtos;
 
 namespace CodeMazeTutorial
 {
@@ -33,6 +35,7 @@ namespace CodeMazeTutorial
 
 			builder.Services.AddAutoMapper(typeof(Program));
 
+			builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			
 			builder.Services.Configure<ApiBehaviorOptions>(options =>
 			{
