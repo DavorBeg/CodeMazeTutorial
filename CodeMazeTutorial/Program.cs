@@ -1,5 +1,6 @@
 
 using CodeMazeTutorial.Extensions;
+using CodeMazeTutorial.Utility;
 using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
 using LoggerService;
@@ -38,6 +39,7 @@ namespace CodeMazeTutorial
 			builder.Services.AddAutoMapper(typeof(Program));
 
 			builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
+			builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
 			
 			builder.Services.Configure<ApiBehaviorOptions>(options =>
 			{
