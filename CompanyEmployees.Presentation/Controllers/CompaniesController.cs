@@ -2,6 +2,7 @@
 using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects.CompanyDtos;
@@ -33,6 +34,7 @@ namespace CompanyEmployees.Presentation.Controllers
 
 		[MapToApiVersion("1.0")]
 		[HttpGet(Name = "GetCompanies")]
+		[Authorize]
 		public async Task<IActionResult> GetCompanies()
 		{
 			var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(false);

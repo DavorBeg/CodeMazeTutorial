@@ -45,11 +45,11 @@ namespace CodeMazeTutorial
 
 			builder.Services.AddAuthentication();
 			builder.Services.ConfigureIdentity();
+			builder.Services.ConfigureJWT(builder.Configuration);
 
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
-
 
 			builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
