@@ -1,4 +1,5 @@
-﻿using CompanyEmployees.Presentation.ActionFilters;
+﻿using Asp.Versioning;
+using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -11,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
-    [Route("api/companies")]
+	[ApiVersion("1.0")]
+	[Route("api/v{version:apiVersion}/companies")]
 	[ApiController]
 	public class CompaniesController : ControllerBase
 	{
@@ -28,7 +30,8 @@ namespace CompanyEmployees.Presentation.Controllers
 			return Ok();
 		}
 
-        [HttpGet(Name = "GetCompanies")]
+		[MapToApiVersion("1.0")]
+		[HttpGet(Name = "GetCompanies")]
 		public async Task<IActionResult> GetCompanies()
 		{
 			var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(false);

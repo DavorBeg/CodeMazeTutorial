@@ -34,6 +34,8 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureServiceManager();
 			builder.Services.ConfigureSqlContext(builder.Configuration);
 			builder.Services.AddActionFiltersServices();
+			builder.Services.ConfigureVersioning();
+
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
