@@ -28,6 +28,8 @@ namespace CodeMazeTutorial
 				.CreateLogger();
 
 			builder.Services.ConfigureCors();
+			builder.Services.ConfigureResponseCaching();
+			builder.Services.ConfigureHttpCacheHeaders();
 			builder.Services.ConfigureIISIntegration();
 			builder.Services.ConfigureLoggerService();
 			builder.Services.ConfigureRepositoryManager();
@@ -52,13 +54,17 @@ namespace CodeMazeTutorial
 			{
 				config.RespectBrowserAcceptHeader = true;
 				config.ReturnHttpNotAcceptable = true;
-				config.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
+				config.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());				config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
 			})
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 			builder.Services.AddCustomMediaTypes();
 
 			var app = builder.Build();
+
+			app.UseCors("CorsPolicy");
+			app.UseResponseCaching();
+			app.UseHttpCacheHeaders();
 
 			var logger = app.Services.GetRequiredService<ILoggerManager>();
 			app.ConfigureExceptionHandler(logger);
