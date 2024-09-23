@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 namespace CompanyEmployees.Presentation.Controllers
 {
     [Route("api/companies/{companyId}/employees")]
+    [ApiController]
     public class EmployeesController : ControllerBase
     {
         private readonly IServiceManager _serviceManager;
@@ -36,6 +37,7 @@ namespace CompanyEmployees.Presentation.Controllers
 
 
 		[HttpGet(Name = "EmployeeCollection")]
+        [HttpHead]
 		[ServiceFilter(typeof(ValidateMediaTypeAttribute))]
 		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
 		{
