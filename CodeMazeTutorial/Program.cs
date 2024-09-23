@@ -1,4 +1,5 @@
 
+using AspNetCoreRateLimit;
 using CodeMazeTutorial.Extensions;
 using CodeMazeTutorial.Utility;
 using CompanyEmployees.Presentation.ActionFilters;
@@ -38,6 +39,10 @@ namespace CodeMazeTutorial
 			builder.Services.AddActionFiltersServices();
 			builder.Services.ConfigureVersioning();
 
+			builder.Services.AddMemoryCache();
+			builder.Services.ConfigureRateLimitingOptions();
+			builder.Services.AddHttpContextAccessor();
+
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
@@ -61,7 +66,7 @@ namespace CodeMazeTutorial
 			builder.Services.AddCustomMediaTypes();
 
 			var app = builder.Build();
-
+			app.UseIpRateLimiting();
 			app.UseCors("CorsPolicy");
 			app.UseResponseCaching();
 			app.UseHttpCacheHeaders();
