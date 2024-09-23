@@ -43,9 +43,13 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureRateLimitingOptions();
 			builder.Services.AddHttpContextAccessor();
 
+			builder.Services.AddAuthentication();
+			builder.Services.ConfigureIdentity();
+
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
+
 
 			builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
@@ -68,6 +72,8 @@ namespace CodeMazeTutorial
 			var app = builder.Build();
 			app.UseIpRateLimiting();
 			app.UseCors("CorsPolicy");
+
+
 			app.UseResponseCaching();
 			app.UseHttpCacheHeaders();
 
@@ -87,6 +93,7 @@ namespace CodeMazeTutorial
 				ForwardedHeaders = ForwardedHeaders.All
 			});
 
+			app.UseAuthentication();
 			app.UseAuthorization();
 			app.MapControllers();
 
