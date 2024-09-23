@@ -43,9 +43,8 @@ namespace CompanyEmployees.Presentation.Controllers
 			var linkParams = new LinkParameters(employeeParameters, HttpContext);
 			var result = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, linkParams, trackChanges: false);
 			Response.Headers["X-Pagination"] = JsonSerializer.Serialize(result.metaData);
-
-			return result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) :
-			Ok(result.linkResponse.ShapedEntities);
+            var returnResult = result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) : Ok(result.linkResponse.ShapedEntities);
+            return returnResult;
 		}
 
 

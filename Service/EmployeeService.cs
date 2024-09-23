@@ -117,7 +117,7 @@ namespace Service
 			
 			var employeesWithMetaData = await _repository.Employee.GetEmployeesAsync(companyId, linkParameters.EmployeeParameters, trackChanges);
 			var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
-			var links = _employeeLinks.TryGenerateLinks(employeesDto, linkParameters.EmployeeParameters.Fields ?? throw new NullReferenceException(nameof(linkParameters.EmployeeParameters.Fields)), companyId, linkParameters.Context);
+			var links = _employeeLinks.TryGenerateLinks(employeesDto, linkParameters.EmployeeParameters.Fields, companyId, linkParameters.Context);
 
 
 			return (linkResponse: links, metaData: employeesWithMetaData.MetaData);

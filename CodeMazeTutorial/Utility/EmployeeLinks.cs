@@ -30,6 +30,7 @@ namespace CodeMazeTutorial.Utility
 
 			if (ShouldGenerateLinks(httpContext))
 				return ReturnLinkdedEmployees(employeesDto, fields, companyId, httpContext, shapedEmployees);
+
 			return ReturnShapedEmployees(shapedEmployees);
 		}
 
@@ -105,7 +106,7 @@ namespace CodeMazeTutorial.Utility
 		{
 			var mediaType = (MediaTypeHeaderValue?)httpContext.Items["AcceptHeaderMediaType"];
 			if (mediaType == null) throw new ArgumentNullException(nameof(MediaTypeHeaderValue));
-			return mediaType.SubTypeWithoutSuffix.EndsWith("hateaos", StringComparison.InvariantCultureIgnoreCase);
+			return mediaType.SubTypeWithoutSuffix.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 		}		private LinkResponse ReturnShapedEmployees(List<Entity> shapedEmployees) => 
 			new LinkResponse { ShapedEntities = shapedEmployees };
 	}

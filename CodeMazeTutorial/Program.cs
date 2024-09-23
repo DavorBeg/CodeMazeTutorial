@@ -54,11 +54,7 @@ namespace CodeMazeTutorial
 			})
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
-
 			builder.Services.AddCustomMediaTypes();
-
-			builder.Services.AddControllers()
-				.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 
 			var app = builder.Build();
 
