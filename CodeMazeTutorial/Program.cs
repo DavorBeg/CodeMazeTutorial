@@ -38,6 +38,7 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureSqlContext(builder.Configuration);
 			builder.Services.AddActionFiltersServices();
 			builder.Services.ConfigureVersioning();
+			builder.Services.AddJwtConfiguration(builder.Configuration);
 
 			builder.Services.AddMemoryCache();
 			builder.Services.ConfigureRateLimitingOptions();

@@ -2,6 +2,7 @@
 using AspNetCoreRateLimit;
 using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
+using Entities.ConfigurationModels;
 using Entities.Models;
 using LoggerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service;
@@ -150,10 +150,16 @@ namespace CodeMazeTutorial.Extensions
             .AddDefaultTokenProviders();
         }
 
+        public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+            services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwt = configuration.GetSection("JwtSettings");
+            var jwtConfig = new JwtConfiguration();
 
+            configuration.Bind(jwtConfig.ToString(), jwtConfig);
+
+            var jwt = configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -168,8 +174,8 @@ namespace CodeMazeTutorial.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwt["validIssuer"],
-                    ValidAudience = jwt["validAudience"],
+                    ValidIssuer = jwtConfig.ValidIssuer,
+                    ValidAudience = jwtConfig.ValidAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Secret"] ?? throw new NullReferenceException("Secret is not defined, null value returned.")))
                 };
             });
