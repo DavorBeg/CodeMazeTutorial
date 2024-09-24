@@ -17,7 +17,7 @@ using Shared.DataTransferObjects.EmployeeDtos;
 namespace CodeMazeTutorial
 {
 
-    // Last page: 40 (CompanyConfiguration class)
+    // Last page: 320 (Ducment api with swagger)
     public class Program
 	{
 		public static void Main(string[] args)
