@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository;
 
@@ -11,9 +12,11 @@ using Repository;
 namespace CodeMazeTutorial.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20240924072927_AddedRefreshTokenProperties")]
+    partial class AddedRefreshTokenProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,13 +228,13 @@ namespace CodeMazeTutorial.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "13604821-03be-475c-9e1e-4109097df08a",
+                            Id = "f5627863-4295-484a-b829-6f4c048d991f",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = "2cd9aadf-9fca-48f9-b138-7ebf00d9b898",
+                            Id = "77b1e6d3-bdeb-4366-86ca-b9f3bae628ad",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
