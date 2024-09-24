@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Contracts;
+using Entities.ConfigurationModels;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Service.Contracts;
 using Shared.DataTransferObjects.EmployeeDtos;
 using System;
@@ -24,7 +26,7 @@ namespace Service
 								IMapper mapper, 
 								IEmployeeLinks employeeLinks, 
 								UserManager<User> userManager,
-								IConfiguration configuration)
+								IOptions<JwtConfiguration> configuration)
 		{
 			_companyService = new Lazy<ICompanyService>(() => new CompanyService(repositoryManager, logger, mapper));
 			_employeeService = new Lazy<IEmployeeService>(() => new EmployeeService(repositoryManager, logger, mapper, employeeLinks));

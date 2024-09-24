@@ -90,10 +90,10 @@ namespace Service
 				ValidateIssuer = true,
 				ValidateIssuerSigningKey = true,
 				IssuerSigningKey = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_jwtConfiguration.Secret ?? throw new NullReferenceException("Secret not configured, value returned null."))),
+				Encoding.UTF8.GetBytes(_jwtConfiguration.Value.Secret ?? throw new NullReferenceException("Secret not configured, value returned null."))),
 				ValidateLifetime = true,
-				ValidIssuer = _jwtConfiguration.ValidIssuer,
-				ValidAudience = _jwtConfiguration.ValidAudience
+				ValidIssuer = _jwtConfiguration.Value.ValidIssuer,
+				ValidAudience = _jwtConfiguration.Value.ValidAudience
 			};			var tokenHandler = new JwtSecurityTokenHandler();			SecurityToken securityToken;			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);			var jwtSecurityToken = securityToken as JwtSecurityToken;
             if ((jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)))
             {
@@ -129,10 +129,10 @@ namespace Service
 		{
 			var tokenOptions =
 				new JwtSecurityToken(
-				issuer: _jwtConfiguration.ValidIssuer,
-				audience: _jwtConfiguration.ValidAudience,
+				issuer: _jwtConfiguration.Value.ValidIssuer,
+				audience: _jwtConfiguration.Value.ValidAudience,
 				claims: claims,
-				expires: DateTime.Now.AddMinutes((Convert.ToDouble(_jwtConfiguration.Expires))),
+				expires: DateTime.Now.AddMinutes((Convert.ToDouble(_jwtConfiguration.Value.Expires))),
 				signingCredentials: signingCredentials);
 
 			return tokenOptions;
