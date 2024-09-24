@@ -119,7 +119,7 @@ namespace CodeMazeTutorial.Extensions
                 new RateLimitRule
                 {
                     Endpoint = "*",
-                    Limit = 3,
+                    Limit = 20,
                     Period = "5m"
                 }
             };

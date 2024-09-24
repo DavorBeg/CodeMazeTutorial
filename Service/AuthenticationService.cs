@@ -38,6 +38,12 @@ namespace Service
 			var signingCredentials = GetSigningCredentials();
 			var claims = await GetClaims();
 
+			var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+
+			return new JwtSecurityTokenHandler()
+				.WriteToken(tokenOptions);
+
+
 		}
 		private async Task<List<Claim>> GetClaims()
 		{
@@ -55,6 +61,7 @@ namespace Service
 		private SigningCredentials GetSigningCredentials()
 		{
 			var jwt = _configuration.GetSection("JwtSettings");
+			var password = jwt["Secret"];
 			var key = Encoding.UTF8.GetBytes(jwt["Secret"] ?? throw new NullReferenceException("Secret is not configured. Value null returned."));
 			var secret = new SymmetricSecurityKey(key);
 			return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -63,7 +70,7 @@ namespace Service
 		private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
 		{
 			var jwtSettings = _configuration.GetSection("JwtSettings");
-
+			var password = jwtSettings["Secret"];
 			var tokenOptions =
 				new JwtSecurityToken(
 				issuer: jwtSettings["validIssuer"],
