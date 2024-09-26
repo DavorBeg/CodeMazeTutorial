@@ -6,6 +6,7 @@ namespace CompanyEmployees.Presentation.Controllers
 {
 	[ApiVersion("2.0")]
 	[Route("api/v{version:apiVersion}/companies")]
+	[ApiExplorerSettings(GroupName = "v2")]
 	[ApiController]
 	public class CompaniesV2Controller : ControllerBase
 	{

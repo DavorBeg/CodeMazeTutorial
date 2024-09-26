@@ -39,6 +39,7 @@ namespace CodeMazeTutorial
 			builder.Services.AddActionFiltersServices();
 			builder.Services.ConfigureVersioning();
 			builder.Services.AddJwtConfiguration(builder.Configuration);
+			builder.Services.ConfigureSwagger();
 
 			builder.Services.AddMemoryCache();
 			builder.Services.ConfigureRateLimitingOptions();
@@ -75,6 +76,12 @@ namespace CodeMazeTutorial
 			app.UseIpRateLimiting();
 			app.UseCors("CorsPolicy");
 
+			app.UseSwagger();
+			app.UseSwaggerUI(opt =>
+			{
+				opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Code Maze API v1");
+				opt.SwaggerEndpoint("/swagger/v2/swagger.json", "Code Maze API v2");
+			});
 
 			app.UseResponseCaching();
 			app.UseHttpCacheHeaders();

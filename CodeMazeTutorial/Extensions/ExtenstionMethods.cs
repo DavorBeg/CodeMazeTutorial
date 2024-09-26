@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Repository;
 using Service;
 using Service.Contracts;
@@ -179,7 +180,63 @@ namespace CodeMazeTutorial.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Secret"] ?? throw new NullReferenceException("Secret is not defined, null value returned.")))
                 };
             });
+
         }
+		public static void ConfigureSwagger(this IServiceCollection services)
+		{
+            services.AddSwaggerGen(opt =>
+            {
+                opt.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Code Maze API", 
+                    Version = "V1",
+                    Description = "CompanyEmployees API by CodeMaze",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "John Doe",
+                        Email = "John.Doe@gmail.com",
+                        Url = new Uri("https://www.examplewebpage.com")
+                    },
+					License = new OpenApiLicense
+					{
+						Name = "CompanyEmployees API LICX",
+						Url = new Uri("https://example.com/license"),
+					}
+
+				});
+                opt.SwaggerDoc("v2", new OpenApiInfo { Title = "Code Maze API", Version = "V1" });
+
+                var xmlFile = $"{typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                opt.IncludeXmlComments(xmlPath);
+
+                opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });                
+                
+                opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+				{
+                    {
+                        new OpenApiSecurityScheme
+                        {
+							Reference = new OpenApiReference
+							{
+                                Type = ReferenceType.SecurityScheme,                                Id = "Bearer"
+                            },
+                            Name = "Bearer"
+                        },
+                        new List<string>()
+                    }
+                });
+
+            });
+		}
 	}
 
 }

@@ -16,7 +16,8 @@ namespace CompanyEmployees.Presentation.Controllers
 {
 	[ApiVersion("1.0")]
 	[Route("api/v{version:apiVersion}/companies")]
-	[ApiController]
+	[ApiExplorerSettings(GroupName = "v1")]
+	[ApiController]
 	public class CompaniesController : ControllerBase
 	{
 		private readonly IServiceManager _serviceManager;
@@ -25,6 +26,7 @@ namespace CompanyEmployees.Presentation.Controllers
             this._serviceManager = serviceManager;	
         }
 
+
 		[HttpOptions]
 		public IActionResult GetCompaniesOptions()
 		{
@@ -32,6 +34,13 @@ namespace CompanyEmployees.Presentation.Controllers
 			return Ok();
 		}
 
+		/// <summary>
+		/// Get the list of all companies
+		/// </summary>
+		/// <returns></returns>
+		/// <response code="201">Returns the newly created item</response>
+		/// <response code="400">If the item is null</response>
+		/// <response code="422">If the model is invalid</response>
 		[MapToApiVersion("1.0")]
 		[HttpGet(Name = "GetCompanies")]
 		[Authorize]
@@ -40,6 +49,7 @@ namespace CompanyEmployees.Presentation.Controllers
 			var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(false);
 			return Ok(companies);
 		}
+
 
 		[HttpGet("{id:guid}", Name = "CompanyById")]
 		[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
@@ -68,14 +78,12 @@ namespace CompanyEmployees.Presentation.Controllers
 		}
 
 
-
 		[HttpPost("collection")]
 		public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
 		{
 			var result = await _serviceManager.CompanyService.CreateCompanyCollectionAsync(companyCollection);
 			return CreatedAtRoute("CompanyCollection", new { result.ids }, result.companies);
 		}
-
 
 
 		[HttpPut("{id:guid}")]
@@ -85,7 +93,6 @@ namespace CompanyEmployees.Presentation.Controllers
 			await _serviceManager.CompanyService.UpdateCompanyAsync(id, company, true);
 			return NoContent();
 		}
-
 
 
 		[HttpDelete]
