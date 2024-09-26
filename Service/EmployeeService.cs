@@ -37,7 +37,7 @@ namespace Service
 		private async Task CheckIfCompanyExist(Guid companyId, bool trackChanges)
 		{
 			var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges);
-			if(company == null) throw new CompanyNotFoundException(companyId);
+			if(company == null) throw new NullReferenceException();
 		}
 
 		private async Task<Employee> GetEmployeeForCompanyAndCheckIfItExists(Guid companyId, Guid id, bool trackChanges)

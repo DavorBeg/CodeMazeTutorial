@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using CompanyEmployees.Presentation.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
@@ -8,7 +9,7 @@ namespace CompanyEmployees.Presentation.Controllers
 	[Route("api/v{version:apiVersion}/companies")]
 	[ApiExplorerSettings(GroupName = "v2")]
 	[ApiController]
-	public class CompaniesV2Controller : ControllerBase
+	public class CompaniesV2Controller : ApiControllerBase
 	{
 		private readonly IServiceManager _service;
 
@@ -22,7 +23,7 @@ namespace CompanyEmployees.Presentation.Controllers
 		public async Task<IActionResult> GetCompanies()
 		{
 			var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
-			return Ok();
+			return Ok(companies);
 		}
 
 	}

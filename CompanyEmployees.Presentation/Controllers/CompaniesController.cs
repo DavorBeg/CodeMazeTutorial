@@ -1,6 +1,9 @@
 ﻿using Asp.Versioning;
+using CompanyEmployees.Presentation.Abstract;
 using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Presentation.Extensions;
 using CompanyEmployees.Presentation.ModelBinders;
+using Entities.Responses;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +21,13 @@ namespace CompanyEmployees.Presentation.Controllers
 	[Route("api/v{version:apiVersion}/companies")]
 	[ApiExplorerSettings(GroupName = "v1")]
 	[ApiController]
-	public class CompaniesController : ControllerBase
+	public class CompaniesController : ApiControllerBase
 	{
 		private readonly IServiceManager _serviceManager;
         public CompaniesController(IServiceManager serviceManager)
         {
             this._serviceManager = serviceManager;	
         }
-
 
 		[HttpOptions]
 		public IActionResult GetCompaniesOptions()
@@ -38,68 +40,74 @@ namespace CompanyEmployees.Presentation.Controllers
 		/// Get the list of all companies
 		/// </summary>
 		/// <returns></returns>
-		/// <response code="201">Returns the newly created item</response>
-		/// <response code="400">If the item is null</response>
-		/// <response code="422">If the model is invalid</response>
-		[MapToApiVersion("1.0")]
-		[HttpGet(Name = "GetCompanies")]
 		[Authorize]
+		[HttpGet(Name = "GetCompanies")]
+		[MapToApiVersion("1.0")]
 		public async Task<IActionResult> GetCompanies()
 		{
-			var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(false);
-			return Ok(companies);
+
+			var baseResult = await _serviceManager.CompanyService.GetAllCompanies(trackChanges: false);
+			var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
+
+			return Ok();
 		}
 
 
-		[HttpGet("{id:guid}", Name = "CompanyById")]
-		[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-		[HttpCacheValidation(MustRevalidate = false)]
-		public async Task<IActionResult> GetCompany(Guid id)
-		{
-			var company = await _serviceManager.CompanyService.GetCompanyAsync(id, false);
-			return Ok(company);
-		}
+		//[HttpGet("{id:guid}", Name = "CompanyById")]
+		//[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+		//[HttpCacheValidation(MustRevalidate = false)]
+		//public async Task<IActionResult> GetCompany(Guid id)
+		//{
+		//	var baseResult = await _serviceManager.CompanyService.GetCompany(id, trackChanges: false);
+
+		//	if (!baseResult.Success)
+		//		return ProcessError(baseResult);
+
+		//	var company = baseResult.GetResult<CompanyDto>();
+
+		//	return Ok(company);
+		//}
 
 
-		[HttpPost(Name = "CreateCompany")]
-		[ServiceFilter(typeof(ValidationFilterAttribute))]
-		public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
-		{
-			var createdCompany = await _serviceManager.CompanyService.CreateCompanyAsync(company);
-			return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
-		}
+		//[HttpPost(Name = "CreateCompany")]
+		//[ServiceFilter(typeof(ValidationFilterAttribute))]
+		//public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
+		//{
+		//	var createdCompany = await _serviceManager.CompanyService.CreateCompanyAsync(company);
+		//	return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
+		//}
 
 
-		[HttpGet("collection/({ids})", Name = "CompanyCollection")]
-		public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
-		{
-			var companies = await _serviceManager.CompanyService.GetByIdsAsync(ids, false);
-			return Ok(companies);
-		}
+		//[HttpGet("collection/({ids})", Name = "CompanyCollection")]
+		//public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
+		//{
+		//	var companies = await _serviceManager.CompanyService.GetByIdsAsync(ids, false);
+		//	return Ok(companies);
+		//}
 
 
-		[HttpPost("collection")]
-		public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
-		{
-			var result = await _serviceManager.CompanyService.CreateCompanyCollectionAsync(companyCollection);
-			return CreatedAtRoute("CompanyCollection", new { result.ids }, result.companies);
-		}
+		//[HttpPost("collection")]
+		//public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
+		//{
+		//	var result = await _serviceManager.CompanyService.CreateCompanyCollectionAsync(companyCollection);
+		//	return CreatedAtRoute("CompanyCollection", new { result.ids }, result.companies);
+		//}
 
 
-		[HttpPut("{id:guid}")]
-		[ServiceFilter(typeof(ValidationFilterAttribute))]
-		public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
-		{
-			await _serviceManager.CompanyService.UpdateCompanyAsync(id, company, true);
-			return NoContent();
-		}
+		//[HttpPut("{id:guid}")]
+		//[ServiceFilter(typeof(ValidationFilterAttribute))]
+		//public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
+		//{
+		//	await _serviceManager.CompanyService.UpdateCompanyAsync(id, company, true);
+		//	return NoContent();
+		//}
 
 
-		[HttpDelete]
-		public async Task<IActionResult> DeleteCompany(Guid id)
-		{
-			await _serviceManager.CompanyService.DeleteCompanyAsync(id, false);
-			return NoContent();
-		}
+		//[HttpDelete]
+		//public async Task<IActionResult> DeleteCompany(Guid id)
+		//{
+		//	await _serviceManager.CompanyService.DeleteCompanyAsync(id, false);
+		//	return NoContent();
+		//}
 	}
 }

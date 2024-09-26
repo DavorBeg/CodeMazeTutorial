@@ -2,6 +2,8 @@
 using Contracts;
 using Entities;
 using Entities.Exceptions;
+using Entities.Responses;
+using Entities.Responses.Abstract;
 using Service.Contracts;
 using Shared.DataTransferObjects.CompanyDtos;
 using System.Formats.Asn1;
@@ -24,10 +26,6 @@ namespace Service
 		private async Task<Company> GetCompanyAndCheckIfItExist(Guid id, bool trackChanges)
 		{
 			var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
-			if (company == null)
-			{
-				throw new CompanyNotFoundException(id);
-			}
 			return company;
 		}
 
@@ -105,5 +103,24 @@ namespace Service
 			_mapper.Map(companyForUpdate, company);
 			await _repository.SaveAsync();
 		}
+
+		public async Task<ApiBaseResponse> GetAllCompanies(bool trackChanges)
+		{
+			var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
+			var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+
+			return new ApiOkResponse<IEnumerable<CompanyDto>>(companiesDto);
+		}
+
+		public async Task<ApiBaseResponse> GetCompany(Guid companyId, bool trackChanges)
+		{
+			var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges);
+			if (company is null)
+				return new CompanyNotFoundException(companyId);
+
+			var companyDto = _mapper.Map<CompanyDto>(company);
+			return new ApiOkResponse<CompanyDto>(companyDto);
+		}
+
 	}
 }

@@ -25,7 +25,6 @@ namespace Service
 		private readonly ILoggerManager _logger;
 		private readonly IMapper _mapper;
 		private readonly UserManager<User> _userManager;
-		private readonly IConfiguration _configuration;
 
 		private readonly IOptions<JwtConfiguration> _jwtConfiguration;
 
@@ -118,9 +117,7 @@ namespace Service
 		}
 		private SigningCredentials GetSigningCredentials()
 		{
-			var jwt = _configuration.GetSection("JwtSettings");
-			var password = jwt["Secret"];
-			var key = Encoding.UTF8.GetBytes(password ?? throw new NullReferenceException("Secret is not configured. Value null returned."));
+			var key = Encoding.UTF8.GetBytes(_jwtConfiguration.Value.Secret ?? throw new NullReferenceException("Secret is not configured. Value null returned."));
 			var secret = new SymmetricSecurityKey(key);
 			return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
 		}

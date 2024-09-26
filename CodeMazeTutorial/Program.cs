@@ -45,10 +45,9 @@ namespace CodeMazeTutorial
 			builder.Services.ConfigureRateLimitingOptions();
 			builder.Services.AddHttpContextAccessor();
 
-			builder.Services.ConfigureJWT(builder.Configuration);
-
 			builder.Services.AddAuthentication();
 			builder.Services.ConfigureIdentity();
+			builder.Services.ConfigureJWT(builder.Configuration);
 
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 

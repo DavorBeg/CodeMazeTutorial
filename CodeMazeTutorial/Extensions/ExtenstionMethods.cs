@@ -159,13 +159,10 @@ namespace CodeMazeTutorial.Extensions
             var jwtConfig = new JwtConfiguration();
 
             configuration.Bind(jwtConfig.ToString(), jwtConfig);
-
-            var jwt = configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
             })
             .AddJwtBearer(options =>
             {
@@ -177,10 +174,9 @@ namespace CodeMazeTutorial.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfig.ValidIssuer,
                     ValidAudience = jwtConfig.ValidAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Secret"] ?? throw new NullReferenceException("Secret is not defined, null value returned.")))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret ?? throw new NullReferenceException("Secret is not defined, null value returned.")))
                 };
             });
-
         }
 		public static void ConfigureSwagger(this IServiceCollection services)
 		{
