@@ -1,19 +1,12 @@
-﻿using Asp.Versioning;
+﻿using Application.Companies.Queries;
+using Asp.Versioning;
 using CompanyEmployees.Presentation.Abstract;
-using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.Extensions;
-using CompanyEmployees.Presentation.ModelBinders;
-using Entities.Responses;
-using Marvin.Cache.Headers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects.CompanyDtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
@@ -24,9 +17,11 @@ namespace CompanyEmployees.Presentation.Controllers
 	public class CompaniesController : ApiControllerBase
 	{
 		private readonly IServiceManager _serviceManager;
-        public CompaniesController(IServiceManager serviceManager)
+		private readonly ISender _sender;
+        public CompaniesController(IServiceManager serviceManager, ISender sender)
         {
             this._serviceManager = serviceManager;	
+			this._sender = sender;
         }
 
 		[HttpOptions]
@@ -40,16 +35,13 @@ namespace CompanyEmployees.Presentation.Controllers
 		/// Get the list of all companies
 		/// </summary>
 		/// <returns></returns>
-		[Authorize]
+		//[Authorize]
 		[HttpGet(Name = "GetCompanies")]
 		[MapToApiVersion("1.0")]
 		public async Task<IActionResult> GetCompanies()
 		{
-
-			var baseResult = await _serviceManager.CompanyService.GetAllCompanies(trackChanges: false);
-			var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
-
-			return Ok();
+			var companies = await _sender.Send(new GetCompaniesQuery(TrackChanges: false));
+			return Ok(companies);
 		}
 
 

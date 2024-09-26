@@ -70,6 +70,10 @@ namespace CodeMazeTutorial
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 			builder.Services.AddCustomMediaTypes();
+			builder.Services.AddMediatR(config =>
+			{
+				config.RegisterServicesFromAssembly(typeof(Application.AssemblyReference).Assembly);
+			});
 
 			var app = builder.Build();
 			app.UseIpRateLimiting();
