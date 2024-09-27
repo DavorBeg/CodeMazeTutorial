@@ -1,10 +1,13 @@
 
+using Application.Companies.Behaviors;
 using AspNetCoreRateLimit;
 using CodeMazeTutorial.Extensions;
 using CodeMazeTutorial.Utility;
 using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
+using FluentValidation;
 using LoggerService;
+using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -52,6 +55,7 @@ namespace CodeMazeTutorial
 			builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 			builder.Services.AddAutoMapper(typeof(Program));
+			builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 			builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
@@ -69,6 +73,8 @@ namespace CodeMazeTutorial
 			})
 			.AddXmlDataContractSerializerFormatters()
 			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
+
+			builder.Services.AddValidatorsFromAssembly(typeof(Application.AssemblyReference).Assembly);	
 			builder.Services.AddCustomMediaTypes();
 			builder.Services.AddMediatR(config =>
 			{

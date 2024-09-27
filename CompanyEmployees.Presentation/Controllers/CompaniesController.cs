@@ -1,4 +1,5 @@
 ﻿using Application.Companies.Commands;
+using Application.Companies.Notifications;
 using Application.Companies.Queries;
 using Asp.Versioning;
 using CompanyEmployees.Presentation.Abstract;
@@ -24,16 +25,18 @@ namespace CompanyEmployees.Presentation.Controllers
 	{
 		private readonly IServiceManager _serviceManager;
 		private readonly ISender _sender;
-        public CompaniesController(IServiceManager serviceManager, ISender sender)
+		private readonly IPublisher _publisher;
+        public CompaniesController(IServiceManager serviceManager, ISender sender, IPublisher publisher)
         {
             this._serviceManager = serviceManager;	
 			this._sender = sender;
+			this._publisher = publisher;
         }
 
 		[HttpOptions]
 		public IActionResult GetCompaniesOptions()
 		{
-			Response.Headers["Alllow"] = "GET, OPTIONS, POST";
+			Response.Headers["Alllow"] = "GET, OPTIONS, POST, DELETE";
 			return Ok();
 		}
 
@@ -61,7 +64,6 @@ namespace CompanyEmployees.Presentation.Controllers
 
 
 		[HttpPost(Name = "CreateCompany")]
-		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
 		{
 			if (company is null)
@@ -98,10 +100,11 @@ namespace CompanyEmployees.Presentation.Controllers
 		}
 
 
-		[HttpDelete]
+		[HttpDelete("{id:guid}")]
 		public async Task<IActionResult> DeleteCompany(Guid id)
 		{
-			await _serviceManager.CompanyService.DeleteCompanyAsync(id, false);
+			var command = new CompanyDeletedNotification(id, TrackChanges: false);
+			await _publisher.Publish(command);
 			return NoContent();
 		}
 	}
