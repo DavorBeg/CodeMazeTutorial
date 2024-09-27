@@ -199,6 +199,33 @@ Data shaping could be topic for itselfs, but I will shrinke informations. In our
 
  And on the end our `DataShaper` was added as scoped service to our app.
 I could write few pages on DataShaper on how does it work. I can only add at the end that I had couple of issues and which was not well documented inside the book and I needed to use source code to fix the problem.
+But in the end, request link was looking like this:
+
+    https://localhost:5001/api/companies/C9D4C053-49B6-410C-BC78-2D54A9991870/employees?pageNumber=1&pageSize=4&minAge=26&maxAge=32&searchTerm=A&orderBy=name
+
+## HATEOAS
+HATEOAS stands for hypermedia as the engine of application state. Which I never saw before and it was completely new topic to me. Book says how this topic is important because REST cannot be consider as RESTful because we would miss benefits from this architecture.
+
+> REST architecture allows us to generate hypermedia links in our responses dynamically and thus make navigation much easier.
+
+So some benefits from HATEOAS are:
+
+ - API becomes self-discoverable and explorable.
+ - A client can use links to implement the logic.
+ - The server drives the application state and URL structure and not vice versa.
+ - The link relations can be used to point the developer's documentation.
+ - Versioning throught hyperlinks becomes easier.
+ - API is evolvable without breaking all the clients.
+ 
+ What are downsides? Only that it's not easy to implement and takes to much time so we should consider doing it before start working on it. 
+
+## Versioning APIs
+
+to be continued...
+
+
+
+
 
 
  
