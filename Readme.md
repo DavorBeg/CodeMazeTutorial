@@ -221,13 +221,197 @@ So some benefits from HATEOAS are:
 
 ## Versioning APIs
 
-to be continued...
+Versioning is very important topic for me, because I had couple of situations where my app broke due to changes on back end part. Requierements change over time and without good versioning system, there is big chance that we will have huge amount of problems in future. I learned that in hard way... In this book I didn't used libraries they gave, because it's market as obsolete `Microsoft.AspNetCore.Mvc.Versioning`. Instead I used `WHAT I USED?`. So some parts of this chapter was completely useless for me. 
+
+First of all I modified my controllers and added one more controller called `CompaniesV2Controller`. 
+I changed Route attribute to: `[Route("api/v{version:apiVersion}/companies")]`
+and added new attribute to controller: `[ApiExplorerSettings(GroupName = "v1")]`.
+Also there is a way where you can set individual actions to different API version just by adding new attribute above given action: `[MapToApiVersion("1.0")]`.
+With implemented version system in every response we get new header `X-Api-Version` which indicate what api version was used for action.
+
+## Caching
+With caching we can improve our performance, but when problem occure, first of all we should take a look at caching, because cached data may be the only logical problem. This is also something I learned hard way... 
+
+To use caching in our action method we should add attribute:
+`[ResponseCache(Duration = 60)]`
+But that would make our app a horror story if someone ask us to change all durations from all our controllers in app. This is where we can also create caching profiles inside `.AddControllers` by adding next:
+```csharp
+config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
+```
+And used it just like this:
+```csharp
+[ResponseCache(CacheProfileName = "120SecondsDuration")]
+```
+As I mentioned before, caching is error prone and there is something called `Validation model` which is used for validate and freshness of the response. It will check if response is cached and still usable. As book said without this, some type of problem may occure:
+
+> If someone updates that company after five minutes, without validation the client would receive the wrong response for another 25 minutes
+
+To support validation I used library `Marvin.Cache.Headers` as book said. This library support cache headers, expires, ETag and Last-Modified by adding just next line of code:
+
+```csharp
+services.AddHttpCacheHeaders();
+```
+But at the end of this chapter book said how ResponseCaching library is not so good for validating, it is much better for just expiration and author gave us couple of alternatives for use:
+
+>  1. Varnish 
+>  2. Apache Traffic Server
+>  3. Squid
+>  CDN ( Content Delivery Network) (not free)
 
 
+## Rate limiting and throttling 
 
+I will not deep dive on this topic, because it's easy to implement and by the title you can make conclusion what does rate limiter and throttling actually do. By following book I used library called `AspNetCoreRateLimit` and by adding simple configuration I configured for what endpoint, what is limit for request in which period. Also I needed to add request pipeline:
+```csharp
+app.UseIpRateLimiting();
+```
 
+## JWT, Identity and Refresh token
 
+By far this chapter, at least for me, was most useful part of the book. Why? With this book, for first time I implemented completely functional `Authentication` and `Authorization` and by replacing `DbContext` to `IdentityDbContext` using a `Microsoft.AspNetCore.Identity.EntityFrameworkCore` library from Microsoft.
 
+```csharp
+builder.Services.AddAuthentication(); 
+// This is my extension method for adding identity.
+builder.Services.ConfigureIdentity();
+
+// Adding middlewares
+app.UseAuthentication();
+app.UseAuthorization();
+```
+Just couple of short sentences for **JWT bearer token**. 
+Full name is JSON Web Token which is used for storing user identity and claims.
+Token is splitted in 3 parts:
+
+ - Head
+ - Payload
+ - Signature
+
+Where in **head** we have all informations for JWT itself, **payload** (or body) we store claims and data. And with **signature** we are aware of which cryptographic was used for encryption/decryption. 
+> WARNING
+> JWT uses symmtrical type of encryption.
+
+To be able to use JWT in safe way I needed to add secret key / password and valid audience who is able to create encrypted data and load them to `.AddJwtBearer()`. Of course before adding `.AddJwtBearer()`, we added authentication like this:
+```csharp
+	services.AddAuthentication(opt =>
+	{
+		opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	})
+```
+ ...where we configured how this authentication will authenticate user and what is default challenge schema.
+
+To make our app follow SOLID principles, we created interface to make some abstraction and interface segregation:
+
+```csharp
+public interface IAuthenticationService
+{
+	Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration);
+	Task<bool> ValidateUser(UserForAuthenticationDto userForAuth);
+	Task<string> CreateToken();
+}
+```
+Which will be used in our application for all authentication processes like `Login` or `Register` or to receive `RefreshToken`. To authenticate and to be authorized at the end we created endpoints `/login` `/register` endpoints and attribute `[authorize]` to protect our action methods in controller from unauthorized users. 
+
+Book finished this topic with implementing the `RefreshToken` to help our user to avoid logging every time when token expires. Main question for me was, why we dont use just token and set greater expiration date? And book explain it well. 
+Just by increasing the token expiration, there is better chance for hacker to take our token and use it. By providing token with shorter expiration date and refresh token, malicious user cant use token for too long.
+
+To add refresh token in identity I needed to add next:
+
+ - Add 2 new properties in our `IdentityUser`
+ - Add new function to our interface `CreateToken(bool populateExp)`
+ - Modify our `AuthenticationService`
+ - Create function that will create our refresh token
+ - Create a function that will get principal from expired token
+ - Modify our already made function `CreateToken()` to handle and return refreshToken.
+ - Modify `/login` endpoint and create new controller for creating token with endpoint `/refresh` for refreshing our token.
+
+## Binding options and option pattern
+In my previous project I used option pattern a lot. Just because it's simple and give us much more possibilities at runtime and development. Only new part that I learned is difference between next interfaces:
+
+ - `IOptions<T>` is used for loading configuration only once. Not support reload.
+ - `IOptionsSnapshot<T>` Can reload/refresh configuration, registered as scoped service. Cant be loaded to **singleton service**.
+ - `IOptionsMonitor<T>` Same as snapshot but not as scoped but as singleton. Can be injected in **any service lifetime**.
+
+I dont have anything special to add to this topic. Option pattern is something crucial to use in almost every project for our good. By finishing this book chapter, I moved all configuration properties inside `appsettings.json` and `appsettings.development.json` file.
+
+## Documenting API with Swagger
  
- 
+ Swagger is so powerful but yet so simple tool, that I used in every project. But by reading the book I also learned something new which may help me in future. I learned even before how swagger can help me and my colleagues in work flow and improving testing and readability of created API. 
+
+With book I learned that swagger can have multiple endpoints for different versions of API and that controller can be discovered with swagger by adding next attribute above controller class:
+```csharp
+[ApiExplorerSettings(GroupName = "v1")]
+```
+
+Something that we needed to implement and it's not implemented by default is `authorization` support. So by adding:
+
+```csharp
+s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+{ 
+	In = ParameterLocation.Header, 
+	Description = "Place to add JWT with Bearer", 
+	Name = "Authorization", 
+	Type = SecuritySchemeType.ApiKey, Scheme = "Bearer" 
+});
+``` 
+
+... And by adding:
+
+```csharp
+s.AddSecurityRequirement(new OpenApiSecurityRequirement() 
+{ 
+	{ 
+		new OpenApiSecurityScheme 
+		{ 
+			Reference = new OpenApiReference 
+			{ 
+				Type = ReferenceType.SecurityScheme, 
+				Id = "Bearer",
+			},
+			Name = "Bearer",
+		},
+		new List()<string>()
+	}
+});
+		
+```
+By adding this we are able to see on every endpoint icon if authorization is required.
+One more thing that I didnt know and I will copy sentence from book is:
+
+> Adding triple-slash comments to the action method enhances the Swagger UI by adding a description to the section header.
+
+## Deployment on IIS
+
+Reason why I took this book is to improve my technology stack. This is why almost everything that I wrote here is something that I already worked on.
+
+IIS is also something that can be packed in separed book because of possibilites...
+But in the end I learned again something new regardless of my previous knowledge of deployment.
+
+**Configuring enviroment file** is something I used first time thanks to this book because of JWT stored in environment file. Yes okey, I have put secret in appsettings, which is not safe and it's very bad practice, but I followed tutorial and I understand the point of author on this topic.
+But after I finished app and moved to this chapter, I felt really bad by not trying it by myself. 
+
+
+## Response and performance improvements
+
+This bonus chapter I also finished and it's implemented in my example app. Can't say anything more then I really prefer this type of response type ex. response pattern, just because it is much more cleaner and easire to extend like how author say:
+
+    We have a solution that is easy to implement, fast, and extendable.
+
+## CQRS and MediatR
+
+CQRS pattern and MediatR library is by far the greatest thing I tried and I really enjoyed this chapter. CQRS which stands for `Command Query Responsibility Segregation` is something I have not yet used, because of scale of my projects, and even book or other developers recommend sometimes to avoid it because of complexity. Can't say it's really complicated, but yeah maybe sometimes not needed to add it, because we may fail `KISS` principle which say `Keep it simple and stupid`. 
+
+With MediatR library which in the end encapsulate CQRS pattern and give us good decouple of components and layers, we accomplished one strong, clean and readable code. Good thing of this pattern is code separation where our read-only part can be much faster, while command part stay the same, easy test code writting and mocking and in the end easy feature upgrades.
+
+Also one good reason of why should someone use MediatR is `IPipelineBehavior` which stands after the request and before behaivor and with that we can modify/validate or what ever we need with data. Just like ASP.NET use Middleware concept.
+
+Implementing for me was not hard, but only because I touched MassTransit which in the end is same principle, only difference is `Broker` like `RabbitMQ` or `Kafka`
+
+## End of story
+
+This is biggest `readme.md` I ever wrote, but point of this is to explain what I have learned, what topics I already known, proof of work, practice in writting good documentation and for myself colective sum of learned topics. 
+
+
+
 
