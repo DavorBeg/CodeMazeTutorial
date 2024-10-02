@@ -333,7 +333,85 @@ In my previous project I used option pattern a lot. Just because it's simple and
  - `IOptionsSnapshot<T>` Can reload/refresh configuration, registered as scoped service. Cant be loaded to **singleton service**.
  - `IOptionsMonitor<T>` Same as snapshot but not as scoped but as singleton. Can be injected in **any service lifetime**.
 
+I dont have anything special to add to this topic. Option pattern is something crucial to use in almost every project for our good. By finishing this book chapter, I moved all configuration properties inside `appsettings.json` and `appsettings.development.json` file.
 
+## Documenting API with Swagger
  
- 
+ Swagger is so powerful but yet so simple tool, that I used in every project. But by reading the book I also learned something new which may help me in future. I learned even before how swagger can help me and my colleagues in work flow and improving testing and readability of created API. 
+
+With book I learned that swagger can have multiple endpoints for different versions of API and that controller can be discovered with swagger by adding next attribute above controller class:
+```csharp
+[ApiExplorerSettings(GroupName = "v1")]
+```
+
+Something that we needed to implement and it's not implemented by default is `authorization` support. So by adding:
+
+```csharp
+s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+{ 
+	In = ParameterLocation.Header, 
+	Description = "Place to add JWT with Bearer", 
+	Name = "Authorization", 
+	Type = SecuritySchemeType.ApiKey, Scheme = "Bearer" 
+});
+``` 
+
+... And by adding:
+
+```csharp
+s.AddSecurityRequirement(new OpenApiSecurityRequirement() 
+{ 
+	{ 
+		new OpenApiSecurityScheme 
+		{ 
+			Reference = new OpenApiReference 
+			{ 
+				Type = ReferenceType.SecurityScheme, 
+				Id = "Bearer",
+			},
+			Name = "Bearer",
+		},
+		new List()<string>()
+	}
+});
+		
+```
+By adding this we are able to see on every endpoint icon if authorization is required.
+One more thing that I didnt know and I will copy sentence from book is:
+
+> Adding triple-slash comments to the action method enhances the Swagger UI by adding a description to the section header.
+
+## Deployment on IIS
+
+Reason why I took this book is to improve my technology stack. This is why almost everything that I wrote here is something that I already worked on.
+
+IIS is also something that can be packed in separed book because of possibilites...
+But in the end I learned again something new regardless of my previous knowledge of deployment.
+
+**Configuring enviroment file** is something I used first time thanks to this book because of JWT stored in environment file. Yes okey, I have put secret in appsettings, which is not safe and it's very bad practice, but I followed tutorial and I understand the point of author on this topic.
+But after I finished app and moved to this chapter, I felt really bad by not trying it by myself. 
+
+
+## Response and performance improvements
+
+This bonus chapter I also finished and it's implemented in my example app. Can't say anything more then I really prefer this type of response type ex. response pattern, just because it is much more cleaner and easire to extend like how author say:
+
+    We have a solution that is easy to implement, fast, and extendable.
+
+## CQRS and MediatR
+
+CQRS pattern and MediatR library is by far the greatest thing I tried and I really enjoyed this chapter. CQRS which stands for `Command Query Responsibility Segregation` is something I have not yet used, because of scale of my projects, and even book or other developers recommend sometimes to avoid it because of complexity. Can't say it's really complicated, but yeah maybe sometimes not needed to add it, because we may fail `KISS` principle which say `Keep it simple and stupid`. 
+
+With MediatR library which in the end encapsulate CQRS pattern and give us good decouple of components and layers, we accomplished one strong, clean and readable code. Good thing of this pattern is code separation where our read-only part can be much faster, while command part stay the same, easy test code writting and mocking and in the end easy feature upgrades.
+
+Also one good reason of why should someone use MediatR is `IPipelineBehavior` which stands after the request and before behaivor and with that we can modify/validate or what ever we need with data. Just like ASP.NET use Middleware concept.
+
+Implementing for me was not hard, but only because I touched MassTransit which in the end is same principle, only difference is `Broker` like `RabbitMQ` or `Kafka`
+
+## End of story
+
+This is biggest `readme.md` I ever wrote, but point of this is to explain what I have learned, what topics I already known, proof of work, practice in writting good documentation and for myself colective sum of learned topics. 
+
+
+
 
